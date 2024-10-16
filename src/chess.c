@@ -121,7 +121,7 @@ void chessMain(Chess *chess){
             }else if(!((input | 0x20) ^ 's')){
                 if(i < 2) i++;
             }
-            uiMain(i);
+            uiMain(i); 
         }
     }
 }
