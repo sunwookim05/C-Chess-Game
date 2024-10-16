@@ -21,6 +21,9 @@ void resetConsole(){
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode(hOut, dwMode);
     printf("\033[H\033[J");
+    GetConsoleMode(hOut, &dwMode);
+    dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
     #else
     printf("\033[H\033[J");
     #endif
