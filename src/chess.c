@@ -114,12 +114,14 @@ void chessMain(Chess *chess){
             #endif
             if(input == '\r'){
                 clearConsole();
-                if(i == 1) howPlay(chess);
-                break;
             }else if(!((input | 0x20) ^ 'w')){
-                if(i > 0) i--;
+                if(!(chess->mode) & i > 0) i--;
             }else if(!((input | 0x20) ^ 's')){
-                if(i < 2) i++;
+                if(!(chess->mode) & i < 2) i++;
+            }else if(!((input | 0x20) ^ 'a')){
+
+            }else if(!((input | 0x20) ^ 'd')){
+
             }
             uiMain(i); 
         }
