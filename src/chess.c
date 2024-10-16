@@ -98,7 +98,8 @@ void howPlay(Chess *chess){
     getchar();
     setColor(RESET);
     clearConsole();
-    chess->chessMain(chess);
+    chess->mode = MAIN;
+    return;
 }
 
 void chessMain(Chess *chess){
@@ -114,14 +115,23 @@ void chessMain(Chess *chess){
             #endif
             if(input == '\r'){
                 clearConsole();
+                if(!i) chess->mode = TWO_PLAYER;
+                if(i == 1) chess->mode = HOW_PLAY;
+                if(i == 2) break;
             }else if(!((input | 0x20) ^ 'w')){
-                if(!(chess->mode) & i > 0) i--;
+                if(!(chess->mode) & (i > 0)) i--;
             }else if(!((input | 0x20) ^ 's')){
-                if(!(chess->mode) & i < 2) i++;
+                if(!(chess->mode) & (i < 2)) i++;
             }else if(!((input | 0x20) ^ 'a')){
 
             }else if(!((input | 0x20) ^ 'd')){
 
+            }
+            switch (chess->mode){
+            case MAIN: uiMain(i);break;
+            case SINGLE_PLAYER: break;
+            case HOW_PLAY: howPlay(chess);
+            default: uiMain(i);break;
             }
             uiMain(i); 
         }
@@ -187,7 +197,7 @@ void makeTable(Chess *chess){
     }
     System.out.println("");
     setColor(chess->isBlackTurn ? GRAY : WHITE);
-    System.out.printf(chess->isBlackTurn ? "Black turn : " : "White turn : ");
+    System.out.printf(chess->isBlackTurn ? "Black turn" : "White turn");
     str = sc.next();
     //(*str + 0) - 0x40 col
 }
