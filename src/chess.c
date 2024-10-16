@@ -13,6 +13,19 @@ void setColor(ColorType color) {
 #endif
 }
 
+void resetConsole(){
+    #ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+    printf("\033[H\033[J");
+    #else
+    printf("\033[H\033[J");
+    #endif
+}
+
 void clearConsole(){
 #ifdef _WIN32
     system("cls");
@@ -170,10 +183,7 @@ void baseTable(Chess *chess) {
 }
 
 void makeTable(Chess *chess){
-    Scanner sc = new_Scanner(System.in);
-    string str;
-    Position exPos, loPos;
-    clearConsole();
+    resetConsole();
     for (size_t i = 0; i < 10; i++) {
         for (size_t j = 0; j < 10; j++) {
             char piece = *(*(chess->table + i) + j);
@@ -198,8 +208,6 @@ void makeTable(Chess *chess){
     System.out.println("");
     setColor(chess->isBlackTurn ? GRAY : WHITE);
     System.out.printf(chess->isBlackTurn ? "Black turn" : "White turn");
-    str = sc.next();
-    //(*str + 0) - 0x40 col
 }
 
 void updateTable(Chess *chess){
