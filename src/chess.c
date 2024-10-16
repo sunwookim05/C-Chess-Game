@@ -113,7 +113,7 @@ void chessMain(Chess *chess){
             #else
             input = kbhit();
             #endif
-            if(input == '\r'){
+            if(input == '\r' || input == '\n'){
                 clearConsole();
                 if(!i) chess->mode = TWO_PLAYER;
                 if(i == 1) chess->mode = HOW_PLAY;
