@@ -128,9 +128,9 @@ void chessMain(Chess *chess){
 
             }
             switch (chess->mode){
-            case MAIN: uiMain(i);break;
+            case MAIN: uiMain(i); break;
             case SINGLE_PLAYER: break;
-            case HOW_PLAY: howPlay(chess);
+            case HOW_PLAY: howPlay(chess); break;
             default: uiMain(i);break;
             }
             uiMain(i); 
