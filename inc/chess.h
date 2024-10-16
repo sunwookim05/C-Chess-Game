@@ -33,6 +33,7 @@ typedef enum {
 
 typedef enum {
     MAIN,
+    HOW_PLAY,
     SINGLE_PLAYER,
     TWO_PLAYER
 } GameMode;
