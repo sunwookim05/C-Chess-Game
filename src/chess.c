@@ -13,8 +13,117 @@ void setColor(ColorType color) {
 #endif
 }
 
-void chessMain(Chess *chess){
+void clearConsole(){
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
 
+#ifndef _WIN32
+int kbhit() {
+    struct termios oldt, newt;
+    int oldf;
+    char ch;
+    int byteswaiting;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    byteswaiting = read(STDIN_FILENO, &ch, 1);
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+    if (byteswaiting == 1) {
+        return ch;
+    }
+    return 0; // No input
+}
+#endif
+
+void colorPrintln(boolean color, const string str){
+    setColor(color ? YELLOW : RESET);
+    System.out.println(str);
+    setColor(RESET);
+}
+
+// boolean canMove(Chess *chess, ChessPiece piece, Position newPos){
+
+// }
+
+void uiMain(uint8_t i){
+    clearConsole();
+    System.out.println("\t\t\tChess");
+    System.out.println("");
+    setColor(GRAY);
+    System.out.println("\t\tSingle Play (to be continue)");
+    colorPrintln(i == 0,"\t\tMulty Play");
+    colorPrintln(i == 1,"\t\tHow to Play");
+    colorPrintln(i == 2,"\t\tEXIT");
+    System.out.println("\n");
+    setColor(GRAY);
+    System.out.println("Select \'W\'&\'S\'\nExecution \'Enter\'");
+    setColor(RESET);
+}
+
+void howPlay(Chess *chess){
+    clearConsole();
+    setColor(GRAY);
+    System.out.printf("=== Chess Move Command Format ===\n");
+    System.out.printf("1. Basic move command: The format is [starting position][destination position] for moving pieces.\n");
+    System.out.printf("   Example: e2e4 -> Moves the pawn from e2 to e4\n");
+    System.out.printf("   Format: [starting position][destination position] (expressed as letter+number)\n");
+    System.out.printf("\n=== Castling Explanation ===\n");
+    System.out.printf("1. Castling is only possible when the king and rook have not moved from their initial positions.\n");
+    System.out.printf("2. Kingside castling (short castling): O-O format where the king moves two squares, and the rook jumps over the king.\n");
+    System.out.printf("   Example: O-O\n");
+    System.out.printf("3. Queenside castling (long castling): O-O-O format where the king moves two squares to the left, and the rook jumps over the king.\n");
+    System.out.printf("   Example: O-O-O\n");
+    System.out.printf("\n=== Promotion Explanation ===\n");
+    System.out.printf("1. Promotion occurs when a pawn reaches the opponent's back rank (8th rank).\n");
+    System.out.printf("2. The pawn can be promoted to a queen, rook, bishop, or knight.\n");
+    System.out.printf("   Format: [starting position][destination position]=[promoted piece]\n");
+    System.out.printf("   Example: e7e8=Q -> The pawn moves from e7 to e8 and promotes to a queen\n");
+    System.out.printf("\n=== En Passant Explanation ===\n");
+    System.out.printf("1. En passant is possible only immediately after an opponent's pawn moves two squares forward from its starting position.\n");
+    System.out.printf("2. When an opponent's pawn is adjacent, you can capture it as if it had only moved one square forward.\n");
+    System.out.printf("   Format: [captured pawn position][destination position].e\n");
+    System.out.printf("   Example: e4d5.e -> The pawn on e4 moves to d5, capturing the opponent's pawn en passant\n\n");
+    System.out.printf("Press any key to return...");
+    getchar();
+    setColor(RESET);
+    clearConsole();
+    chess->chessMain(chess);
+}
+
+void chessMain(Chess *chess){
+    uint8_t i = 0;
+    char input;
+    uiMain(i);
+    while(true){
+        if(kbhit()){
+            #ifdef _WIN32
+            input = getch();
+            #else
+            input = kbhit();
+            #endif
+            if(input == '\r'){
+                clearConsole();
+                if(i == 1) howPlay(chess);
+                break;
+            }else if(!((input | 0x20) ^ 'w')){
+                if(i > 0) i--;
+            }else if(!((input | 0x20) ^ 's')){
+                if(i < 2) i++;
+            }
+            uiMain(i);
+        }
+    }
 }
 
 void baseTable(Chess *chess) {
@@ -49,6 +158,10 @@ void baseTable(Chess *chess) {
 }
 
 void makeTable(Chess *chess){
+    Scanner sc = new_Scanner(System.in);
+    string str;
+    Position exPos, loPos;
+    clearConsole();
     for (size_t i = 0; i < 10; i++) {
         for (size_t j = 0; j < 10; j++) {
             char piece = *(*(chess->table + i) + j);
@@ -65,12 +178,16 @@ void makeTable(Chess *chess){
                     }
                 }
             }
-
             System.out.printf(j == 0 || j == 8 ? "%c  " : "%c " , piece);
             setColor(RESET);
         }
         System.out.println("");
     }
+    System.out.println("");
+    setColor(chess->isBlackTurn ? GRAY : WHITE);
+    System.out.printf(chess->isBlackTurn ? "Black turn : " : "White turn : ");
+    str = sc.next();
+    //(*str + 0) - 0x40 col
 }
 
 void updateTable(Chess *chess){
@@ -85,7 +202,6 @@ Chess new_Chess(){
     chess.piece = (ChessPiece*)malloc(sizeof(ChessPiece) * 32);
     chess.table = (string*)malloc(sizeof(string) * 10);
     for(size_t i = 0; i < 9; i++) *(chess.table + i) = (string)malloc(sizeof(char) * 10);
-    chess.setColor = setColor;
     chess.baseTable = baseTable;
     chess.chessMain = chessMain;
     chess.makeTable = makeTable;

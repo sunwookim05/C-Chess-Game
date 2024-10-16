@@ -9,8 +9,10 @@ import SYSTEM System;
 int main(void){ 
     Chess chess = new_Chess();
 
-    chess.baseTable(&chess);
-    chess.makeTable(&chess);
+    chess.chessMain(&chess);
+    
+    // chess.baseTable(&chess);
+    // chess.makeTable(&chess);
     
     return 0;
 }

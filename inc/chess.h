@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <conio.h>
 typedef int32_t ColorType;
 #define BLACK    0
 #define GRAY     8
@@ -11,6 +12,8 @@ typedef int32_t ColorType;
 #define RESET    7
 #else
 #include <unistd.h>
+#include <termios.h>
+#include <fcntl.h>
 typedef const char* ColorType;
 #define BLACK   "\033[30m"
 #define RED     "\033[31m"
@@ -75,7 +78,6 @@ typedef struct Chess{
     EnPassant enPassant;
     ChessPiece *piece;
     string *table;
-    void (*setColor)(ColorType);
     void (*chessMain)(struct Chess*);
     void (*baseTable)(struct Chess*);
     void (*makeTable)(struct Chess*);
